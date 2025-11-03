@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Menu Chatbot</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        /* Chat header */
+        .chat-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .chat-header .icon {
+            font-size: 28px;
+        }
+
+        /* Chat box */
+        .chat-box {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .chat-box::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+
+        .chat-box::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            margin: 10px 0;
+            border-radius: 15px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.5;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .ai-message {
+            background: white;
+            color: #333;
+            align-self: flex-start;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            align-self: flex-end;
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            padding: 12px 16px;
+            background: white;
+            border-radius: 15px;
+            width: fit-content;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin: 10px 0;
+        }
+
+        .typing-indicator .dot {
+            width: 10px;
+            height: 10px;
+            margin: 0 3px;
+            background-color: #999;
+            border-radius: 50%;
+            animation: blink 1.4s infinite both;
+        }
+
+        .typing-indicator .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes blink {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+
+        /* Input area */
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            outline: none;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .chat-input input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .send-btn:active {
+            transform: translateY(0);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Welcome message */
+        .welcome-message {
+            text-align: center;
+            padding: 30px 20px;
+            color: #666;
+        }
+
+        .welcome-message h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .welcome-message p {
+            margin: 5px 0;
+        }
+
+        /* Example questions */
+        .example-questions {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .example-btn {
+            background: white;
+            border: 2px solid #e0e0e0;
+            padding: 12px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .example-btn:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateX(5px);
+        }
+
+        /* Mobile responsive */
+        @media (max-width: 600px) {
+            body {
+                padding: 0;
+            }
+
+            .container {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            .chat-box {
+                height: calc(100vh - 140px);
+            }
+        }
+
+        /* Error message */
+        .error-message {
+            background: #fee;
+            border-left: 4px solid #f44;
+            color: #c33;
+            padding: 12px 16px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="chat-header">
+            <span class="icon">🍕</span>
+            <span>Restaurant Menu Bot</span>
+        </div>
+        
+        <div class="chat-box" id="chatBox">
+            <div class="welcome-message">
+                <h2>👋 Welcome!</h2>
+                <p>Ask me about our food menu and prices!</p>
+                
+                <div class="example-questions">
+                    <button class="example-btn" onclick="askQuestion('What food do you have?')">
+                        🍽️ What food do you have?
+                    </button>
+                    <button class="example-btn" onclick="askQuestion('How much is the pizza?')">
+                        💰 How much is the pizza?
+                    </button>
+                    <button class="example-btn" onclick="askQuestion('What desserts do you have?')">
+                        🍰 What desserts do you have?
+                    </button>
+                    <button class="example-btn" onclick="askQuestion('Show me all prices')">
+                        💵 Show me all prices
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="typingIndicator" class="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        
+        <div class="chat-input">
+            <input 
+                type="text" 
+                id="userInput" 
+                placeholder="Ask about our menu..." 
+                onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                autocomplete="off">
+            <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Webhook URL will be loaded from server config
+        let WEBHOOK_URL = '';
+        let messageCount = 0;
+        let configLoaded = false;
+
+        // Load configuration from server
+        async function loadConfig() {
+            try {
+                const response = await fetch('/config');
+                const config = await response.json();
+                WEBHOOK_URL = config.webhookUrl;
+                
+                if (!WEBHOOK_URL) {
+                    console.warn('⚠️ Webhook URL not configured. Please set WEBHOOK_URL in .env file');
+                }
+                configLoaded = true;
+            } catch (error) {
+                console.error('Failed to load config:', error);
+                configLoaded = true; // Allow page to work even if config fails
+            }
+        }
+
+        // Load config on page load
+        loadConfig();
+
+        // Add message to chat
+        function addMessage(text, isUser = false) {
+            const chatBox = document.getElementById("chatBox");
+            
+            // Remove welcome message on first message
+            if (messageCount === 0) {
+                chatBox.innerHTML = '';
+            }
+            messageCount++;
+
+            const messageDiv = document.createElement("div");
+            messageDiv.classList.add("message", isUser ? "user-message" : "ai-message");
+            messageDiv.textContent = text;
+            chatBox.appendChild(messageDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Add error message
+        function addErrorMessage(text) {
+            const chatBox = document.getElementById("chatBox");
+            const errorDiv = document.createElement("div");
+            errorDiv.classList.add("error-message");
+            errorDiv.textContent = text;
+            chatBox.appendChild(errorDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Ask example question
+        function askQuestion(question) {
+            document.getElementById("userInput").value = question;
+            sendMessage();
+        }
+
+        // Send message to n8n
+        async function sendMessage() {
+            const inputField = document.getElementById("userInput");
+            const sendBtn = document.getElementById("sendBtn");
+            const message = inputField.value.trim();
+            
+            if (message === "") return;
+
+            // Wait for config to load
+            if (!configLoaded) {
+                await loadConfig();
+            }
+
+            // Check if webhook URL is configured
+            if (!WEBHOOK_URL || WEBHOOK_URL === '') {
+                addErrorMessage("⚠️ Webhook URL not configured. Please set WEBHOOK_URL in your .env file and restart the server.");
+                return;
+            }
+
+            // Disable input while processing
+            inputField.disabled = true;
+            sendBtn.disabled = true;
+
+            // Display user message
+            addMessage(message, true);
+            inputField.value = "";
+
+            // Show typing indicator
+            const typingIndicator = document.getElementById("typingIndicator");
+            typingIndicator.style.display = "flex";
+
+            try {
+                const response = await fetch(WEBHOOK_URL, {
+                    method: "POST",
+                    headers: { 
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ 
+                        message: message 
+                    })
+                });
+
+                typingIndicator.style.display = "none";
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Get AI response
+                const aiResponse = data[0]?.output || "Sorry, I didn't understand that. Can you try asking differently?";
+                addMessage(aiResponse, false);
+
+            } catch (error) {
+                typingIndicator.style.display = "none";
+                console.error("Error:", error);
+                addErrorMessage("😔 Oops! Something went wrong. Please check your connection and try again.");
+            } finally {
+                // Re-enable input
+                inputField.disabled = false;
+                sendBtn.disabled = false;
+                inputField.focus();
+            }
+        }
+
+        // Focus input on load
+        window.addEventListener('load', () => {
+            document.getElementById("userInput").focus();
+        });
+    </script>
+</body>
+</html>
