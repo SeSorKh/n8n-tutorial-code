@@ -11,9 +11,13 @@
       },
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [300, 300],
-      "id": "webhook-node",
-      "name": "Webhook"
+      "position": [
+        -208,
+        -64
+      ],
+      "id": "975710fa-49a8-42b5-ac96-2ea3eb563c7d",
+      "name": "Webhook",
+      "webhookId": "fdee6cd8-1b59-467c-884a-5d0261b0f432"
     },
     {
       "parameters": {
@@ -26,12 +30,16 @@
               "type": "string"
             }
           ]
-        }
+        },
+        "options": {}
       },
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
-      "position": [500, 300],
-      "id": "set-node",
+      "position": [
+        16,
+        -64
+      ],
+      "id": "27932882-e218-454b-8de3-7a37941d8876",
       "name": "Extract Message"
     },
     {
@@ -39,13 +47,16 @@
         "promptType": "define",
         "text": "={{ $json.user_message }}",
         "options": {
-          "systemMessage": "You are a helpful restaurant assistant. Answer questions about our menu and prices ONLY.\n\n**MENU:**\n- Pizza Margherita - $12\n- Spaghetti Carbonara - $14\n- Caesar Salad - $10\n- Grilled Salmon - $18\n- Tiramisu - $8\n- Burger - $15\n- French Fries - $6\n- Chicken Wings - $13\n- Ice Cream - $7\n\n**RULES:**\n1. Keep responses short\n2. ONLY answer about food items and prices from the menu\n3. If asked about anything else, say: \"I can only help with menu items and prices. What food would you like to know about?\"\n4. List items and prices clearly"
+          "systemMessage": "You are a helpful restaurant assistant. Answer questions about our menu and prices.\n\n**MENU:**\n- Pizza Margherita - $12\n- Spaghetti Carbonara - $14\n- Caesar Salad - $10\n- Grilled Salmon - $18\n- Tiramisu - $8\n- Burger - $15\n- French Fries - $6\n- Chicken Wings - $13\n- Ice Cream - $7\n\n**RULES:**\n1. When asked \"What food do you have?\" or similar, list all the menu items with prices\n2. When asked about specific items, give the price and name\n3. Keep responses short and friendly\n4. ONLY answer about food items and prices from the menu above\n5. If asked about hours, location, reservations, or anything NOT on the menu, say: \"I can only help with menu items and prices. What food would you like to know about?\"\n\n**EXAMPLES:**\nUser: \"What food do you have?\"\nYou: \"Here's our menu:\n- Pizza Margherita - $12\n- Spaghetti Carbonara - $14\n- Caesar Salad - $10\n- Grilled Salmon - $18\n- Tiramisu - $8\n- Burger - $15\n- French Fries - $6\n- Chicken Wings - $13\n- Ice Cream - $7\"\n\nUser: \"How much is the pizza?\"\nYou: \"Pizza Margherita is $12\"\n\nUser: \"What are your hours?\"\nYou: \"I can only help with menu items and prices. What food would you like to know about?\""
         }
       },
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 1.7,
-      "position": [700, 300],
-      "id": "ai-agent",
+      "position": [
+        208,
+        -64
+      ],
+      "id": "b5e404e3-9f85-4b94-ab92-a16c671bbc02",
       "name": "AI Agent"
     },
     {
@@ -59,13 +70,16 @@
       },
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
       "typeVersion": 1.2,
-      "position": [700, 480],
-      "id": "openai-model",
+      "position": [
+        208,
+        144
+      ],
+      "id": "a2f1a3ac-322b-4c1e-9fb2-3f9537906b31",
       "name": "OpenAI Chat Model",
       "credentials": {
         "openAiApi": {
-          "id": "YOUR_OPENAI_CREDENTIAL_ID",
-          "name": "OpenAi account"
+          "id": "8dAbj4NY2jVAm2YW",
+          "name": "n8n free OpenAI API credits"
         }
       }
     },
@@ -76,26 +90,63 @@
       },
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [900, 300],
-      "id": "respond-node",
+      "position": [
+        496,
+        -64
+      ],
+      "id": "c7e0b055-dea9-4786-b0db-d8b58e2574e0",
       "name": "Respond to Webhook"
     }
   ],
   "connections": {
     "Webhook": {
-      "main": [[{"node": "Extract Message", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Extract Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "Extract Message": {
-      "main": [[{"node": "AI Agent", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "AI Agent": {
-      "main": [[{"node": "Respond to Webhook", "type": "main", "index": 0}]]
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     },
     "OpenAI Chat Model": {
-      "ai_languageModel": [[{"node": "AI Agent", "type": "ai_languageModel", "index": 0}]]
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
+  "pinData": {},
   "meta": {
-    "instanceId": "tutorial-simple-bot"
+    "templateCredsSetupCompleted": true,
+    "instanceId": "bc081db08a0408d61870400bf19c0dea6ae0d6bb9a1f692038e1ba99d339b562"
   }
 }
